@@ -1,0 +1,5 @@
+FROM node:12
+RUN git clone https://github.com/bertl4398/open5gs.git
+WORKDIR /open5gs/webui
+RUN npm ci --no-optional
+CMD ["npm", "run", "dev"]

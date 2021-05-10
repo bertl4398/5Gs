@@ -1,0 +1,293 @@
+services:
+    mongodb:
+        image: mongo
+        ports:
+            - 27017:27017
+        volumes:
+            - mongodb:/data/db
+        networks:
+            - open5gs
+    redis:
+        image: redis
+        ports:
+            - "6379:6379"
+        networks:
+            - open5gs
+    mme:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: mme.localdomain
+        hostname: mme
+        command: >
+            bash -c "python3 init.py mme
+            && /5gs/bin/open5gs-mmed"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+            - sgwc
+            - smf
+        networks:
+            - open5gs
+    sgwc:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: sgwc.localdomain
+        hostname: sgwc
+        command: >
+            bash -c "python3 init.py sgwc
+            && /5gs/bin/open5gs-sgwcd"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+            - sgwu
+        networks:
+            - open5gs
+    smf:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: smf.localdomain
+        hostname: smf
+        command: >
+            bash -c "python3 init.py smf
+            && /5gs/bin/open5gs-smfd"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+            - nrf
+            - upf
+        networks:
+            - open5gs
+    amf:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: amf.localdomain
+        hostname: amf
+        command: >
+            bash -c "python3 init.py amf
+            && /5gs/bin/open5gs-amfd"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+            - nrf
+        networks:
+            - open5gs
+        # ports:
+        #     - target: 38412
+        #       published: 38412
+        #       protocol: sctp
+    sgwu:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: sgwu.localdomain
+        hostname: sgwu
+        command: >
+            bash -c "python3 init.py sgwu
+            && /5gs/bin/open5gs-sgwud"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+        networks:
+            - open5gs
+    upf:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: upf.localdomain
+        hostname: upf
+        command: >
+            bash -c "python3 init.py upf
+            && /5gs/bin/open5gs-upfd"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        devices:
+            - /dev/net/tun:/dev/net/tun            
+        cap_add:
+            - NET_ADMIN
+        depends_on:
+            - redis
+        networks:
+            - open5gs
+    hss:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: hss.localdomain
+        hostname: hss
+        command: >
+            bash -c "python3 init.py hss
+            && /5gs/bin/open5gs-hssd"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+            - mongodb
+        networks:
+            - open5gs
+    pcrf:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: pcrf.localdomain
+        hostname: pcrf
+        command: >
+            bash -c "python3 init.py pcrf
+            && /5gs/bin/open5gs-pcrfd"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+            - mongodb
+        networks:
+            - open5gs
+    nrf:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: nrf.localdomain
+        hostname: nrf
+        command: >
+            bash -c "python3 init.py nrf
+            && /5gs/bin/open5gs-nrfd"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+            - mongodb
+        networks:
+            - open5gs
+    ausf:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: ausf.localdomain
+        hostname: ausf
+        command: >
+            bash -c "python3 init.py ausf
+            && /5gs/bin/open5gs-ausfd"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+            - nrf
+        networks:
+            - open5gs
+    udm:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: udm.localdomain
+        hostname: udm
+        command: >
+            bash -c "python3 init.py udm
+            && /5gs/bin/open5gs-udmd"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+            - nrf
+        networks:
+            - open5gs
+    pcf:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: pcf.localdomain
+        hostname: pcf
+        command: >
+            bash -c "python3 init.py pcf
+            && /5gs/bin/open5gs-pcfd"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+            - mongodb
+            - nrf
+        networks:
+            - open5gs
+    nssf:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: nssf.localdomain
+        hostname: nssf
+        command: >
+            bash -c "python3 init.py nssf
+            && /5gs/bin/open5gs-nssfd"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+            - nrf
+        networks:
+            - open5gs
+    udr:
+        build:
+            context: .
+            dockerfile: Dockerfile-open5gs
+        image: open5gs
+        domainname: udr.localdomain
+        hostname: udr
+        command: >
+            bash -c "python3 init.py udr
+            && /5gs/bin/open5gs-udrd"
+        volumes:
+            - ./open5gs/init.py:/open5gs/init.py
+        depends_on:
+            - redis
+            - mongodb
+            - nrf
+        networks:
+            - open5gs
+    webui:
+        build:
+            context: .
+            dockerfile: Dockerfile-webui
+        image: open5gs-webui
+        environment:
+            - DB_URI=mongodb://mongodb/open5gs
+        depends_on:
+            - mongodb
+        ports:
+            - "3000:3000"
+        networks:
+            - open5gs
+    ueransim:
+        build:
+            context: .
+            dockerfile: Dockerfile-ueransim
+        image: ueransim
+        command: bash -c "while true; do sleep 10; done"
+        networks:
+            - open5gs
+        devices:
+            - /dev/net/tun:/dev/net/tun            
+        cap_add:
+            - NET_ADMIN
+volumes:
+    mongodb: {}
+networks:
+    open5gs:
+        name: open5gs

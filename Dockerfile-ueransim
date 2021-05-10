@@ -1,0 +1,24 @@
+FROM ubuntu:20.04
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Berlin
+RUN apt-get update && apt-get install -y \
+  build-essential \
+  make \
+  g++ \
+  libssl-dev \
+  libsctp-dev \
+  lksctp-tools \
+  git \
+  curl \
+  iproute2 \
+  vim \
+  tshark \
+  tmux
+RUN git clone https://github.com/Kitware/CMake.git
+WORKDIR /CMake
+RUN ./bootstrap && make && make install
+WORKDIR /
+RUN git clone https://github.com/bertl4398/UERANSIM.git
+WORKDIR /UERANSIM
+RUN make
+CMD ["build/nr-gnb"]

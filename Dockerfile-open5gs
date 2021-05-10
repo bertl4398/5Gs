@@ -1,0 +1,40 @@
+FROM ubuntu:20.04
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Berlin
+RUN apt-get update && apt-get install -y \
+  python3-pip \
+  python3-setuptools \
+  python3-wheel \
+  ninja-build \
+  build-essential \
+  flex \
+  bison \
+  git \
+  libsctp-dev \
+  libgnutls28-dev \
+  libgcrypt-dev \
+  libssl-dev \
+  libidn11-dev \
+  libmongoc-dev \
+  libbson-dev \
+  libyaml-dev \
+  libnghttp2-dev \
+  libmicrohttpd-dev \
+  libcurl4-gnutls-dev \
+  libnghttp2-dev \
+  meson \
+  iproute2 \
+  tshark \
+  tmux
+RUN git clone https://github.com/bertl4398/open5gs.git
+WORKDIR /open5gs
+RUN meson build --prefix=/5gs
+RUN ninja -C build
+RUN ninja -C build install
+WORKDIR /
+RUN git clone https://github.com/bertl4398/5Gs.git
+WORKDIR /5Gs
+RUN pip3 install --no-cache-dir -r requirements.txt
+CMD [ "python3", "./init.py" ]
