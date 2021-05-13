@@ -33,6 +33,7 @@ WORKDIR /open5gs
 RUN meson build --prefix=/5gs
 RUN ninja -C build
 RUN ninja -C build install
+ENV LD_LIBRARY_PATH="/5gs/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
 WORKDIR /
 RUN git clone https://github.com/bertl4398/5Gs.git
 WORKDIR /5Gs

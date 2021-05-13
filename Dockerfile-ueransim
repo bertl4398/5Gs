@@ -2,6 +2,9 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Berlin
 RUN apt-get update && apt-get install -y \
+  python3-pip \
+  python3-setuptools \
+  python3-wheel \
   build-essential \
   make \
   g++ \
@@ -21,4 +24,8 @@ WORKDIR /
 RUN git clone https://github.com/bertl4398/UERANSIM.git
 WORKDIR /UERANSIM
 RUN make
-CMD ["build/nr-gnb"]
+WORKDIR /
+RUN git clone https://github.com/bertl4398/5Gs.git
+WORKDIR /5Gs
+RUN pip3 install --no-cache-dir -r requirements.txt
+CMD [ "python3", "./init.py" ]

@@ -337,6 +337,21 @@ def init_udr():
     bios.write('/5gs/etc/open5gs/udr.yaml', config, file_type='yaml')
 
 
+def init_gnb():
+    gnb_ip = __get_own_ip()
+    print(f"gnb_ip {gnb_ip}")
+    __publish_ip('gnb_ip', gnb_ip)
+    amf_ip = __get_ip('amf_ip')
+    print(f"amf_ip {amf_ip}")
+
+    config = bios.read('/UERANSIM/config/open5gs-gnb.yaml')
+    config['linkIp'] = gnb_ip
+    config['ngapIp'] = gnb_ip
+    config['gtpIp'] = gnb_ip
+    config['amfConfigs'][0]['address'] = amf_ip
+    bios.write('/UERANSIM/config/open5gs-gnb.yaml', config, file_type='yaml')
+
+
 if __name__ == "__main__":
     if sys.argv[1] == "mme":
         init_mme()
@@ -366,4 +381,6 @@ if __name__ == "__main__":
         init_nssf()
     elif sys.argv[1] == "udr":
         init_udr()
+    elif sys.argv[1] == "gnb":
+        init_gnb()
     print("init", sys.argv[1], "done")
