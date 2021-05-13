@@ -1,0 +1,887 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: mongodb-data
+    labels:
+        app: mongodb
+spec:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+        requests:
+            storage: 50Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: mongodb
+    labels:
+        app: mongodb
+spec:
+    selector:
+        app: mongodb
+    ports:
+      - protocol: TCP
+        port: 27017
+        targetPort: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: mongodb
+    labels:
+        app: mongodb
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: mongodb
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                app: mongodb
+        spec:
+            containers:
+              - name: mongodb
+                image: mongo
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - containerPort: 27017
+                volumeMounts:
+                  - name: mongodb-data
+                    mountPath: /data/db/
+            volumes:
+              - name: mongodb-data
+                persistentVolumeClaim:
+                    claimName: mongodb-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: redis
+    labels:
+        app: redis
+spec:
+    selector:
+        app: redis
+    ports:
+      - protocol: TCP
+        port: 6379
+        targetPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: redis
+    labels:
+        app: redis
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: redis
+    template:
+        metadata:
+            labels:
+                app: redis
+        spec:
+            containers:
+              - name: redis
+                image: redis
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mme
+spec:
+  selector:
+    open5gs: mme
+  ports:
+    - name: s1ap
+      port: 36412
+      targetPort: 36412
+    - name: gtpc
+      port: 2123
+      targetPort: 2123
+    - name: frdi
+      port: 3868
+      targetPort: 3868
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: mme
+    labels:
+        open5gs: mme
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: mme
+    template:
+        metadata:
+            labels:
+                open5gs: mme
+        spec:
+            hostname: mme
+            subdomain: localhost
+            containers:
+              - name: mme
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: s1ap
+                    containerPort: 36412
+                  - name: gtpc
+                    containerPort: 2123
+                  - name: frdi
+                    containerPort: 3868
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py mme && /5gs/bin/open5gs-mmed"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sgwc
+spec:
+  selector:
+    open5gs: sgwc
+  ports:
+    - name: gtpc
+      port: 2123
+      targetPort: 2123
+    - name: pfcp
+      port: 8805
+      targetPort: 8805
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: sgwc
+    labels:
+        open5gs: sgwc
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: sgwc
+    template:
+        metadata:
+            labels:
+                open5gs: sgwc
+        spec:
+            hostname: sgwc
+            subdomain: localhost
+            containers:
+              - name: sgwc
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: gtpc
+                    containerPort: 2123
+                  - name: pfcp
+                    containerPort: 8805
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py sgwc && /5gs/bin/open5gs-sgwcd"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smf
+spec:
+  selector:
+    open5gs: smf
+  ports:
+    - name: gtpc
+      port: 2123
+      targetPort: 2123
+    - name: gtpu
+      port: 2152
+      targetPort: 2152
+    - name: pfcp
+      port: 8805
+      targetPort: 8805
+    - name: frdi
+      port: 3868
+      targetPort: 3868
+    - name: sbi
+      port: 7777
+      targetPort: 7777
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: smf
+    labels:
+        open5gs: smf
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: smf
+    template:
+        metadata:
+            labels:
+                open5gs: smf
+        spec:
+            hostname: smf
+            subdomain: localhost
+            containers:
+              - name: smf
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: gtpc
+                    containerPort: 2123
+                  - name: gtpu
+                    containerPort: 2152
+                  - name: pfcp
+                    containerPort: 8805
+                  - name: frdi
+                    containerPort: 3868
+                  - name: sbi
+                    containerPort: 7777
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py smf && /5gs/bin/open5gs-smfd"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: amf
+spec:
+  selector:
+    open5gs: amf
+  ports:
+    - name: ngap
+      protocol: SCTP
+      port: 38412
+      targetPort: 38412
+    - name: sbi
+      port: 7777
+      targetPort: 7777
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: amf
+    labels:
+        open5gs: amf
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: amf
+    template:
+        metadata:
+            labels:
+                open5gs: amf
+        spec:
+            hostname: amf
+            subdomain: localhost
+            containers:
+              - name: amf
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: ngap
+                    containerPort: 38412
+                    protocol: SCTP
+                  - name: sbi
+                    containerPort: 7777
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py amf && /5gs/bin/open5gs-amfd"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sgwu
+spec:
+  selector:
+    open5gs: sgwu
+  ports:
+    - name: pfcp
+      port: 8805
+      targetPort: 8805
+    - name: gtpu
+      port: 2152
+      targetPort: 2152
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: sgwu
+    labels:
+        open5gs: sgwu
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: sgwu
+    template:
+        metadata:
+            labels:
+                open5gs: sgwu
+        spec:
+            hostname: sgwu
+            subdomain: localhost
+            containers:
+              - name: sgwu
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: pfcp
+                    containerPort: 8805
+                  - name: gtpu
+                    containerPort: 2152
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py sgwu && /5gs/bin/open5gs-sgwud"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf
+spec:
+  selector:
+    open5gs: upf
+  ports:
+    - name: pfcp
+      port: 8805
+      targetPort: 8805
+    - name: gtpu
+      port: 2152
+      targetPort: 2152
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: upf
+    labels:
+        open5gs: upf
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: upf
+    template:
+        metadata:
+            labels:
+                open5gs: upf
+        spec:
+            hostname: upf
+            subdomain: localhost
+            containers:
+              - name: upf
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: pfcp
+                    containerPort: 8805
+                  - name: gtpu
+                    containerPort: 2152
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py upf && /5gs/bin/open5gs-upfd"]
+                securityContext:
+                  privileged: true
+                  capabilities:
+                    add:
+                      - NET_ADMIN
+                volumeMounts:
+                  - mountPath: /dev/net/tun
+                    name: dev-net-tun
+            volumes:
+              - name: dev-net-tun
+                hostPath:
+                  path: /dev/net/tun
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hss
+spec:
+  selector:
+    open5gs: hss
+  ports:
+    - name: frdi
+      port: 3868
+      targetPort: 3868
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: hss
+    labels:
+        open5gs: hss
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: hss
+    template:
+        metadata:
+            labels:
+                open5gs: hss
+        spec:
+            hostname: hss
+            subdomain: localhost
+            containers:
+              - name: hss
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: frdi
+                    containerPort: 3868
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py hss && /5gs/bin/open5gs-hssd"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcrf
+spec:
+  selector:
+    open5gs: pcrf
+  ports:
+    - name: frdi
+      port: 3868
+      targetPort: 3868
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: pcrf
+    labels:
+        open5gs: pcrf
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: pcrf
+    template:
+        metadata:
+            labels:
+                open5gs: pcrf
+        spec:
+            hostname: pcrf
+            subdomain: localhost
+            containers:
+              - name: pcrf
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: frdi
+                    containerPort: 3868
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py pcrf && /5gs/bin/open5gs-pcrfd"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nrf
+spec:
+  selector:
+    open5gs: nrf
+  ports:
+    - name: sbi
+      port: 7777
+      targetPort: 7777
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: nrf
+    labels:
+        open5gs: nrf
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: nrf
+    template:
+        metadata:
+            labels:
+                open5gs: nrf
+        spec:
+            hostname: nrf
+            subdomain: localhost
+            containers:
+              - name: nrf
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: sbi
+                    containerPort: 7777
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py nrf && /5gs/bin/open5gs-nrfd"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ausf
+spec:
+  selector:
+    open5gs: ausf
+  ports:
+    - name: sbi
+      port: 7777
+      targetPort: 7777
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: ausf
+    labels:
+        open5gs: ausf
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: ausf
+    template:
+        metadata:
+            labels:
+                open5gs: ausf
+        spec:
+            hostname: ausf
+            subdomain: localhost
+            containers:
+              - name: ausf
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: sbi
+                    containerPort: 7777
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py ausf && /5gs/bin/open5gs-ausfd"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: udm
+spec:
+  selector:
+    open5gs: udm
+  ports:
+    - name: sbi
+      port: 7777
+      targetPort: 7777
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: udm
+    labels:
+        open5gs: udm
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: udm
+    template:
+        metadata:
+            labels:
+                open5gs: udm
+        spec:
+            hostname: udm
+            subdomain: localhost
+            containers:
+              - name: udm
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: sbi
+                    containerPort: 7777
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py udm && /5gs/bin/open5gs-udmd"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcf
+spec:
+  selector:
+    open5gs: pcf
+  ports:
+    - name: sbi
+      port: 7777
+      targetPort: 7777
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: pcf
+    labels:
+        open5gs: pcf
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: pcf
+    template:
+        metadata:
+            labels:
+                open5gs: pcf
+        spec:
+            hostname: pcf
+            subdomain: localhost
+            containers:
+              - name: pcf
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: sbi
+                    containerPort: 7777
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py pcf && /5gs/bin/open5gs-pcfd"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nssf
+spec:
+  selector:
+    open5gs: nssf
+  ports:
+    - name: sbi
+      port: 7777
+      targetPort: 7777
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: nssf
+    labels:
+        open5gs: nssf
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: nssf
+    template:
+        metadata:
+            labels:
+                open5gs: nssf
+        spec:
+            hostname: nssf
+            subdomain: localhost
+            containers:
+              - name: nssf
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: sbi
+                    containerPort: 7777
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py nssf && /5gs/bin/open5gs-nssfd"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: udr
+spec:
+  selector:
+    open5gs: udr
+  ports:
+    - name: sbi
+      port: 7777
+      targetPort: 7777
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: udr
+    labels:
+        open5gs: udr
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: udr
+    template:
+        metadata:
+            labels:
+                open5gs: udr
+        spec:
+            hostname: udr
+            subdomain: localhost
+            containers:
+              - name: udr
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: sbi
+                    containerPort: 7777
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py udr && /5gs/bin/open5gs-udrd"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webui
+spec:
+  selector:
+    open5gs: webui
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: webui
+    labels:
+        open5gs: webui
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: webui
+    template:
+        metadata:
+            labels:
+                open5gs: webui
+        spec:
+            hostname: webui
+            subdomain: localhost
+            containers:
+              - name: webui
+                image: webui
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - containerPort: 3000
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                  - name: DB_URI
+                    value: mongodb://mongodb/open5gs
+            initContainers:
+              - name: init-mongodb
+                image: busybox:1.28
+                command: ['sh', '-c', "until nslookup mongodb.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for mongodb; sleep 2; done"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gnb
+spec:
+  selector:
+    open5gs: gnb
+  type: NodePort
+  ports:
+    - port: 38412
+      protocol: SCTP
+      targetPort: 38412
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: gnb
+    labels:
+        open5gs: gnb
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: gnb
+    template:
+        metadata:
+            labels:
+                open5gs: gnb
+        spec:
+            hostname: gnb
+            subdomain: localhost
+            containers:
+              - name: gnb
+                image: ueransim
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - containerPort: 38412
+                    protocol: SCTP
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py gnb && /UERANSIM/build/nr-gnb -c /UERANSIM/config/open5gs-gnb.yaml"]
+            initContainers:
+              - name: init-amf
+                image: busybox:1.28
+                command: ['sh', '-c', "until nslookup amf.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for amf; sleep 2; done"]
