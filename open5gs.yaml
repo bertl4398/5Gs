@@ -491,7 +491,7 @@ spec:
                 lifecycle:
                   postStart:
                     exec:
-                      command: ["/bin/sh", "-c", "sleep 10 && ip link set ogstun up && ip addr add 10.0.0.1/24 dev ogstun"]
+                      command: ["/bin/sh", "-c", "sleep 10 && ip link set ogstun up && ip addr add 10.0.0.2/24 dev ogstun"]
                 securityContext:
                   privileged: true
                   capabilities:
@@ -906,7 +906,7 @@ spec:
             containers:
               - name: webui
                 #image: bertl4398/open5gs-webui
-                image: open5gs
+                image: open5gs-webui
                 imagePullPolicy: IfNotPresent
                 ports:
                   - containerPort: 3000
@@ -956,7 +956,7 @@ spec:
             containers:
               - name: gnb
                 #image: bertl4398/ueransim
-                image: open5gs
+                image: ueransim
                 imagePullPolicy: IfNotPresent
                 ports:
                   - containerPort: 38412
