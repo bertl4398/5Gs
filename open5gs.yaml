@@ -132,6 +132,7 @@ spec:
             subdomain: localhost
             containers:
               - name: mme
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -184,6 +185,7 @@ spec:
             subdomain: localhost
             containers:
               - name: sgwc
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -243,6 +245,7 @@ spec:
             subdomain: localhost
             containers:
               - name: smf
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -262,7 +265,7 @@ spec:
                       fieldRef:
                         fieldPath: status.podIP
                 command: ["/bin/sh", "-c"]
-                args: ["python3 init.py smf && /5gs/bin/open5gs-smfd"]
+                args: ["python3 init.py smf 2 && /5gs/bin/open5gs-smfd"]
 ---
 apiVersion: v1
 kind: Service
@@ -300,6 +303,7 @@ spec:
             subdomain: localhost
             containers:
               - name: amf
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -351,6 +355,7 @@ spec:
             subdomain: localhost
             containers:
               - name: sgwu
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -369,10 +374,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: upf
+  name: upf-1
 spec:
   selector:
-    open5gs: upf
+    open5gs: upf-1
   ports:
     - name: pfcp
       port: 8805
@@ -384,23 +389,24 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: upf
+    name: upf-1
     labels:
-        open5gs: upf
+        open5gs: upf-1
 spec:
     replicas: 1
     selector:
         matchLabels:
-            open5gs: upf
+            open5gs: upf-1
     template:
         metadata:
             labels:
-                open5gs: upf
+                open5gs: upf-1
         spec:
             hostname: upf
             subdomain: localhost
             containers:
               - name: upf
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -414,7 +420,78 @@ spec:
                       fieldRef:
                         fieldPath: status.podIP
                 command: ["/bin/sh", "-c"]
-                args: ["python3 init.py upf && /5gs/bin/open5gs-upfd"]
+                args: ["python3 init.py upf 1 && /5gs/bin/open5gs-upfd"]
+                lifecycle:
+                  postStart:
+                    exec:
+                      command: ["/bin/sh", "-c", "sleep 10 && ip link set ogstun up && ip addr add 10.0.0.1/24 dev ogstun"]
+                securityContext:
+                  privileged: true
+                  capabilities:
+                    add:
+                      - NET_ADMIN
+                volumeMounts:
+                  - mountPath: /dev/net/tun
+                    name: dev-net-tun
+            volumes:
+              - name: dev-net-tun
+                hostPath:
+                  path: /dev/net/tun
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf-2
+spec:
+  selector:
+    open5gs: upf-2
+  ports:
+    - name: pfcp
+      port: 8805
+      targetPort: 8805
+    - name: gtpu
+      port: 2152
+      targetPort: 2152
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: upf-2
+    labels:
+        open5gs: upf-2
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: upf-2
+    template:
+        metadata:
+            labels:
+                open5gs: upf-2
+        spec:
+            hostname: upf
+            subdomain: localhost
+            containers:
+              - name: upf
+                #image: bertl4398/open5gs
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: pfcp
+                    containerPort: 8805
+                  - name: gtpu
+                    containerPort: 2152
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py upf 2 && /5gs/bin/open5gs-upfd"]
+                lifecycle:
+                  postStart:
+                    exec:
+                      command: ["/bin/sh", "-c", "sleep 10 && ip link set ogstun up && ip addr add 10.0.0.1/24 dev ogstun"]
                 securityContext:
                   privileged: true
                   capabilities:
@@ -460,6 +537,7 @@ spec:
             subdomain: localhost
             containers:
               - name: hss
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -505,6 +583,7 @@ spec:
             subdomain: localhost
             containers:
               - name: pcrf
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -550,6 +629,7 @@ spec:
             subdomain: localhost
             containers:
               - name: nrf
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -595,6 +675,7 @@ spec:
             subdomain: localhost
             containers:
               - name: ausf
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -640,6 +721,7 @@ spec:
             subdomain: localhost
             containers:
               - name: udm
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -685,6 +767,7 @@ spec:
             subdomain: localhost
             containers:
               - name: pcf
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -730,6 +813,7 @@ spec:
             subdomain: localhost
             containers:
               - name: nssf
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -775,6 +859,7 @@ spec:
             subdomain: localhost
             containers:
               - name: udr
+                #image: bertl4398/open5gs
                 image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
@@ -820,7 +905,8 @@ spec:
             subdomain: localhost
             containers:
               - name: webui
-                image: webui
+                #image: bertl4398/open5gs-webui
+                image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
                   - containerPort: 3000
@@ -869,7 +955,8 @@ spec:
             subdomain: localhost
             containers:
               - name: gnb
-                image: ueransim
+                #image: bertl4398/ueransim
+                image: open5gs
                 imagePullPolicy: IfNotPresent
                 ports:
                   - containerPort: 38412
@@ -881,6 +968,18 @@ spec:
                         fieldPath: status.podIP
                 command: ["/bin/sh", "-c"]
                 args: ["python3 init.py gnb && /UERANSIM/build/nr-gnb -c /UERANSIM/config/open5gs-gnb.yaml"]
+                securityContext:
+                  privileged: true
+                  capabilities:
+                    add:
+                      - NET_ADMIN
+                volumeMounts:
+                  - mountPath: /dev/net/tun
+                    name: dev-net-tun
+            volumes:
+              - name: dev-net-tun
+                hostPath:
+                  path: /dev/net/tun
             initContainers:
               - name: init-amf
                 image: busybox:1.28

@@ -103,17 +103,21 @@ def init_sgwc():
     bios.write('/5gs/etc/open5gs/sgwc.yaml', config, file_type='yaml')
 
 
-def init_smf():
+def init_smf(upf=1):
     smf_ip = __get_own_ip()
     print(f"smf_ip {smf_ip}")
     __publish_ip('smf_ip', smf_ip)
 
     nrf_ip = __get_ip('nrf_ip')
-    upf_ip = __get_ip('upf_ip')
     pcrf_ip = __get_ip('pcrf_ip')
     print(f"nrf_ip {nrf_ip}")
-    print(f"upf_ip {upf_ip}")
     print(f"pcrf_ip {pcrf_ip}")
+    
+    upf_ips = []
+    for i in range(upf):
+        upf_ip = __get_ip(f'upf_ip_{i}')
+        upf_ips.append({'addr': upf_ip})
+        print(f"upf_ips {upf_ips}")
 
     config = bios.read('/5gs/etc/open5gs/smf.yaml')
     config['smf']['sbi'] = {'addr': smf_ip, 'port': 7777}
@@ -121,7 +125,7 @@ def init_smf():
     config['smf']['gtpc'] = {'addr': smf_ip}
     config['smf']['gtpu'] = {'addr': smf_ip}
     config['nrf']['sbi'] = {'addr': nrf_ip, 'port': 7777}
-    config['upf']['pfcp'] = {'addr': upf_ip}
+    config['upf']['pfcp'] = upf_ips
     bios.write('/5gs/etc/open5gs/smf.yaml', config, file_type='yaml')
 
     file_in = "/5gs/etc/freeDiameter/smf.conf"
@@ -174,10 +178,10 @@ def init_sgwu():
     bios.write('/5gs/etc/open5gs/sgwu.yaml', config, file_type='yaml')
 
 
-def init_upf():
+def init_upf(scale=1):
     upf_ip = __get_own_ip()
     print(f"upf_ip {upf_ip}")
-    __publish_ip('upf_ip', upf_ip)
+    __publish_ip(f'upf_ip_{scale}', upf_ip)
 
     config = bios.read('/5gs/etc/open5gs/upf.yaml')
     config['upf']['pfcp'] = {'addr': upf_ip}
@@ -358,13 +362,19 @@ if __name__ == "__main__":
     elif sys.argv[1] == "sgwc":
         init_sgwc()
     elif sys.argv[1] == "smf":
-        init_smf()
+        if sys.argv[2]:
+            init_smf(sys.argv[2])
+        else:
+            init_smf(1)
     elif sys.argv[1] == "amf":
         init_amf()
     elif sys.argv[1] == "sgwu":
         init_sgwu()
     elif sys.argv[1] == "upf":
-        init_upf()
+        if sys.argv[2]:
+            init_upf((int(sys.argv[2])))
+        else:
+            init_upf(1)
     elif sys.argv[1] == "hss":
         init_hss()
     elif sys.argv[1] == "pcrf":
