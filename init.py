@@ -363,7 +363,7 @@ if __name__ == "__main__":
         init_sgwc()
     elif sys.argv[1] == "smf":
         if sys.argv[2]:
-            init_smf(sys.argv[2])
+            init_smf(int(sys.argv[2]))
         else:
             init_smf(1)
     elif sys.argv[1] == "amf":
