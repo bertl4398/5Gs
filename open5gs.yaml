@@ -146,9 +146,9 @@ spec:
             subdomain: localhost
             containers:
               - name: mme
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: s1ap
                     containerPort: 36412
@@ -199,9 +199,9 @@ spec:
             subdomain: localhost
             containers:
               - name: sgwc
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: gtpc
                     containerPort: 2123
@@ -259,9 +259,9 @@ spec:
             subdomain: localhost
             containers:
               - name: smf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: gtpc
                     containerPort: 2123
@@ -317,9 +317,9 @@ spec:
             subdomain: localhost
             containers:
               - name: amf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: ngap
                     containerPort: 38412
@@ -369,9 +369,9 @@ spec:
             subdomain: localhost
             containers:
               - name: sgwu
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: pfcp
                     containerPort: 8805
@@ -420,9 +420,9 @@ spec:
             subdomain: localhost
             containers:
               - name: upf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: pfcp
                     containerPort: 8805
@@ -487,9 +487,9 @@ spec:
             subdomain: localhost
             containers:
               - name: upf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: pfcp
                     containerPort: 8805
@@ -554,9 +554,9 @@ spec:
             subdomain: localhost
             containers:
               - name: upf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: pfcp
                     containerPort: 8805
@@ -621,9 +621,9 @@ spec:
             subdomain: localhost
             containers:
               - name: upf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: pfcp
                     containerPort: 8805
@@ -688,9 +688,9 @@ spec:
             subdomain: localhost
             containers:
               - name: upf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: pfcp
                     containerPort: 8805
@@ -755,9 +755,9 @@ spec:
             subdomain: localhost
             containers:
               - name: upf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: pfcp
                     containerPort: 8805
@@ -822,9 +822,9 @@ spec:
             subdomain: localhost
             containers:
               - name: upf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: pfcp
                     containerPort: 8805
@@ -889,9 +889,9 @@ spec:
             subdomain: localhost
             containers:
               - name: upf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: pfcp
                     containerPort: 8805
@@ -956,9 +956,9 @@ spec:
             subdomain: localhost
             containers:
               - name: upf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: pfcp
                     containerPort: 8805
@@ -1020,9 +1020,9 @@ spec:
             subdomain: localhost
             containers:
               - name: hss
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: frdi
                     containerPort: 3868
@@ -1066,9 +1066,9 @@ spec:
             subdomain: localhost
             containers:
               - name: pcrf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: frdi
                     containerPort: 3868
@@ -1112,9 +1112,9 @@ spec:
             subdomain: localhost
             containers:
               - name: nrf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: sbi
                     containerPort: 7777
@@ -1158,9 +1158,9 @@ spec:
             subdomain: localhost
             containers:
               - name: ausf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: sbi
                     containerPort: 7777
@@ -1204,9 +1204,9 @@ spec:
             subdomain: localhost
             containers:
               - name: udm
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: sbi
                     containerPort: 7777
@@ -1250,9 +1250,9 @@ spec:
             subdomain: localhost
             containers:
               - name: pcf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: sbi
                     containerPort: 7777
@@ -1296,9 +1296,9 @@ spec:
             subdomain: localhost
             containers:
               - name: nssf
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: sbi
                     containerPort: 7777
@@ -1342,9 +1342,9 @@ spec:
             subdomain: localhost
             containers:
               - name: udr
-                #image: bertl4398/open5gs
-                image: open5gs
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs
+                # image: open5gs
+                imagePullPolicy: Always
                 ports:
                   - name: sbi
                     containerPort: 7777
@@ -1388,9 +1388,9 @@ spec:
             subdomain: localhost
             containers:
               - name: webui
-                #image: bertl4398/open5gs-webui
-                image: open5gs-webui
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/open5gs-webui
+                # image: open5gs-webui
+                imagePullPolicy: Always
                 ports:
                   - containerPort: 3000
                 env:
@@ -1438,9 +1438,9 @@ spec:
             subdomain: localhost
             containers:
               - name: gnb
-                #image: bertl4398/ueransim
-                image: ueransim
-                imagePullPolicy: IfNotPresent
+                image: bertl4398/ueransim
+                # image: ueransim
+                imagePullPolicy: Always
                 ports:
                   - containerPort: 38412
                     protocol: SCTP
