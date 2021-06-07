@@ -118,7 +118,7 @@ def init_smf(upf=1):
         upf_i = i + 1
         upf_ip = __get_ip(f'upf_ip_{upf_i}')
         upf_ips.append({'addr': upf_ip})
-        print(f"upf_ip_{i} {upf_ip}")
+        print(f"upf_ip_{upf_i} {upf_ip}")
 
     config = bios.read('/5gs/etc/open5gs/smf.yaml')
     config['smf']['sbi'] = {'addr': smf_ip, 'port': 7777}

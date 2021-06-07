@@ -1,15 +1,29 @@
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongodb-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-    name: mongodb-data
-    labels:
-        app: mongodb
+  name: mongodb-pv-claim
 spec:
-    accessModes:
-      - ReadWriteOnce
-    resources:
-        requests:
-            storage: 50Mi
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
 ---
 apiVersion: v1
 kind: Service
@@ -55,7 +69,7 @@ spec:
             volumes:
               - name: mongodb-data
                 persistentVolumeClaim:
-                    claimName: mongodb-data
+                    claimName: mongodb-pv-claim
 ---
 apiVersion: v1
 kind: Service
@@ -265,7 +279,7 @@ spec:
                       fieldRef:
                         fieldPath: status.podIP
                 command: ["/bin/sh", "-c"]
-                args: ["python3 init.py smf 2 && /5gs/bin/open5gs-smfd"]
+                args: ["python3 init.py smf 9 && /5gs/bin/open5gs-smfd"]
 ---
 apiVersion: v1
 kind: Service
@@ -492,6 +506,475 @@ spec:
                   postStart:
                     exec:
                       command: ["/bin/sh", "-c", "sleep 10 && ip link set ogstun up && ip addr add 10.45.0.12/16 dev ogstun"]
+                securityContext:
+                  privileged: true
+                  capabilities:
+                    add:
+                      - NET_ADMIN
+                volumeMounts:
+                  - mountPath: /dev/net/tun
+                    name: dev-net-tun
+            volumes:
+              - name: dev-net-tun
+                hostPath:
+                  path: /dev/net/tun
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf-3
+spec:
+  selector:
+    open5gs: upf-3
+  ports:
+    - name: pfcp
+      port: 8805
+      targetPort: 8805
+    - name: gtpu
+      port: 2152
+      targetPort: 2152
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: upf-3
+    labels:
+        open5gs: upf-3
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: upf-3
+    template:
+        metadata:
+            labels:
+                open5gs: upf-3
+        spec:
+            hostname: upf
+            subdomain: localhost
+            containers:
+              - name: upf
+                #image: bertl4398/open5gs
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: pfcp
+                    containerPort: 8805
+                  - name: gtpu
+                    containerPort: 2152
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py upf 3 && /5gs/bin/open5gs-upfd"]
+                lifecycle:
+                  postStart:
+                    exec:
+                      command: ["/bin/sh", "-c", "sleep 10 && ip link set ogstun up && ip addr add 10.45.0.13/16 dev ogstun"]
+                securityContext:
+                  privileged: true
+                  capabilities:
+                    add:
+                      - NET_ADMIN
+                volumeMounts:
+                  - mountPath: /dev/net/tun
+                    name: dev-net-tun
+            volumes:
+              - name: dev-net-tun
+                hostPath:
+                  path: /dev/net/tun
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf-4
+spec:
+  selector:
+    open5gs: upf-4
+  ports:
+    - name: pfcp
+      port: 8805
+      targetPort: 8805
+    - name: gtpu
+      port: 2152
+      targetPort: 2152
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: upf-4
+    labels:
+        open5gs: upf-4
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: upf-4
+    template:
+        metadata:
+            labels:
+                open5gs: upf-4
+        spec:
+            hostname: upf
+            subdomain: localhost
+            containers:
+              - name: upf
+                #image: bertl4398/open5gs
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: pfcp
+                    containerPort: 8805
+                  - name: gtpu
+                    containerPort: 2152
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py upf 4 && /5gs/bin/open5gs-upfd"]
+                lifecycle:
+                  postStart:
+                    exec:
+                      command: ["/bin/sh", "-c", "sleep 10 && ip link set ogstun up && ip addr add 10.45.0.14/16 dev ogstun"]
+                securityContext:
+                  privileged: true
+                  capabilities:
+                    add:
+                      - NET_ADMIN
+                volumeMounts:
+                  - mountPath: /dev/net/tun
+                    name: dev-net-tun
+            volumes:
+              - name: dev-net-tun
+                hostPath:
+                  path: /dev/net/tun
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf-5
+spec:
+  selector:
+    open5gs: upf-5
+  ports:
+    - name: pfcp
+      port: 8805
+      targetPort: 8805
+    - name: gtpu
+      port: 2152
+      targetPort: 2152
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: upf-5
+    labels:
+        open5gs: upf-5
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: upf-5
+    template:
+        metadata:
+            labels:
+                open5gs: upf-5
+        spec:
+            hostname: upf
+            subdomain: localhost
+            containers:
+              - name: upf
+                #image: bertl4398/open5gs
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: pfcp
+                    containerPort: 8805
+                  - name: gtpu
+                    containerPort: 2152
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py upf 5 && /5gs/bin/open5gs-upfd"]
+                lifecycle:
+                  postStart:
+                    exec:
+                      command: ["/bin/sh", "-c", "sleep 10 && ip link set ogstun up && ip addr add 10.45.0.15/16 dev ogstun"]
+                securityContext:
+                  privileged: true
+                  capabilities:
+                    add:
+                      - NET_ADMIN
+                volumeMounts:
+                  - mountPath: /dev/net/tun
+                    name: dev-net-tun
+            volumes:
+              - name: dev-net-tun
+                hostPath:
+                  path: /dev/net/tun
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf-6
+spec:
+  selector:
+    open5gs: upf-6
+  ports:
+    - name: pfcp
+      port: 8805
+      targetPort: 8805
+    - name: gtpu
+      port: 2152
+      targetPort: 2152
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: upf-6
+    labels:
+        open5gs: upf-6
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: upf-6
+    template:
+        metadata:
+            labels:
+                open5gs: upf-6
+        spec:
+            hostname: upf
+            subdomain: localhost
+            containers:
+              - name: upf
+                #image: bertl4398/open5gs
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: pfcp
+                    containerPort: 8805
+                  - name: gtpu
+                    containerPort: 2152
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py upf 6 && /5gs/bin/open5gs-upfd"]
+                lifecycle:
+                  postStart:
+                    exec:
+                      command: ["/bin/sh", "-c", "sleep 10 && ip link set ogstun up && ip addr add 10.45.0.16/16 dev ogstun"]
+                securityContext:
+                  privileged: true
+                  capabilities:
+                    add:
+                      - NET_ADMIN
+                volumeMounts:
+                  - mountPath: /dev/net/tun
+                    name: dev-net-tun
+            volumes:
+              - name: dev-net-tun
+                hostPath:
+                  path: /dev/net/tun
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf-7
+spec:
+  selector:
+    open5gs: upf-7
+  ports:
+    - name: pfcp
+      port: 8805
+      targetPort: 8805
+    - name: gtpu
+      port: 2152
+      targetPort: 2152
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: upf-7
+    labels:
+        open5gs: upf-7
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: upf-7
+    template:
+        metadata:
+            labels:
+                open5gs: upf-7
+        spec:
+            hostname: upf
+            subdomain: localhost
+            containers:
+              - name: upf
+                #image: bertl4398/open5gs
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: pfcp
+                    containerPort: 8805
+                  - name: gtpu
+                    containerPort: 2152
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py upf 7 && /5gs/bin/open5gs-upfd"]
+                lifecycle:
+                  postStart:
+                    exec:
+                      command: ["/bin/sh", "-c", "sleep 10 && ip link set ogstun up && ip addr add 10.45.0.17/16 dev ogstun"]
+                securityContext:
+                  privileged: true
+                  capabilities:
+                    add:
+                      - NET_ADMIN
+                volumeMounts:
+                  - mountPath: /dev/net/tun
+                    name: dev-net-tun
+            volumes:
+              - name: dev-net-tun
+                hostPath:
+                  path: /dev/net/tun
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf-8
+spec:
+  selector:
+    open5gs: upf-8
+  ports:
+    - name: pfcp
+      port: 8805
+      targetPort: 8805
+    - name: gtpu
+      port: 2152
+      targetPort: 2152
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: upf-8
+    labels:
+        open5gs: upf-8
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: upf-8
+    template:
+        metadata:
+            labels:
+                open5gs: upf-8
+        spec:
+            hostname: upf
+            subdomain: localhost
+            containers:
+              - name: upf
+                #image: bertl4398/open5gs
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: pfcp
+                    containerPort: 8805
+                  - name: gtpu
+                    containerPort: 2152
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py upf 8 && /5gs/bin/open5gs-upfd"]
+                lifecycle:
+                  postStart:
+                    exec:
+                      command: ["/bin/sh", "-c", "sleep 10 && ip link set ogstun up && ip addr add 10.45.0.18/16 dev ogstun"]
+                securityContext:
+                  privileged: true
+                  capabilities:
+                    add:
+                      - NET_ADMIN
+                volumeMounts:
+                  - mountPath: /dev/net/tun
+                    name: dev-net-tun
+            volumes:
+              - name: dev-net-tun
+                hostPath:
+                  path: /dev/net/tun
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf-9
+spec:
+  selector:
+    open5gs: upf-9
+  ports:
+    - name: pfcp
+      port: 8805
+      targetPort: 8805
+    - name: gtpu
+      port: 2152
+      targetPort: 2152
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: upf-9
+    labels:
+        open5gs: upf-9
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            open5gs: upf-9
+    template:
+        metadata:
+            labels:
+                open5gs: upf-9
+        spec:
+            hostname: upf
+            subdomain: localhost
+            containers:
+              - name: upf
+                #image: bertl4398/open5gs
+                image: open5gs
+                imagePullPolicy: IfNotPresent
+                ports:
+                  - name: pfcp
+                    containerPort: 8805
+                  - name: gtpu
+                    containerPort: 2152
+                env:
+                  - name: POD_IP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.podIP
+                command: ["/bin/sh", "-c"]
+                args: ["python3 init.py upf 9 && /5gs/bin/open5gs-upfd"]
+                lifecycle:
+                  postStart:
+                    exec:
+                      command: ["/bin/sh", "-c", "sleep 10 && ip link set ogstun up && ip addr add 10.45.0.19/16 dev ogstun"]
                 securityContext:
                   privileged: true
                   capabilities:
