@@ -117,7 +117,7 @@ def init_smf(upf=1):
     for i in range(upf):
         upf_i = i + 1
         upf_ip = __get_ip(f'upf_ip_{upf_i}')
-        upf_ips.append({'addr': upf_ip})
+        upf_ips.append({'addr': upf_ip,'dnn':f'internet{upf_i}'})
         print(f"upf_ip_{upf_i} {upf_ip}")
 
     config = bios.read('/5gs/etc/open5gs/smf.yaml')
