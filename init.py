@@ -51,17 +51,13 @@ def init_mme():
     hss_ip = __get_ip('hss_ip')
     sgwc_ip = __get_ip('sgwc_ip')
     smf_ip = __get_ip('smf_ip')
-    
     print(f"hss_ip {hss_ip}")
     print(f"sgwc_ip {sgwc_ip}")
     print(f"smf_ip {smf_ip}")
 
-    mme_ip = "mme"
     hss_ip = "hss"
     sgwc_ip = "sgwc"
     smf_ip = "smf"
-
-    print(f"mme_ip {mme_ip}")
     print(f"hss_ip {hss_ip}")
     print(f"sgwc_ip {sgwc_ip}")
     print(f"smf_ip {smf_ip}")
@@ -106,10 +102,7 @@ def init_sgwc():
     sgwu_ip = __get_ip('sgwu_ip')
     print(f"sgwu_ip {sgwu_ip}")
 
-    sgwc_ip = "sgwc"
     sgwu_ip = "sgwu"
-    
-    print(f"sgwc_ip {sgwc_ip}")
     print(f"sgwu_ip {sgwu_ip}")
 
     config = bios.read('/5gs/etc/open5gs/sgwc.yaml')
@@ -129,11 +122,8 @@ def init_smf(upf=1):
     print(f"nrf_ip {nrf_ip}")
     print(f"pcrf_ip {pcrf_ip}")
     
-    smf_ip = "smf"
     nrf_ip = "nrf"
     pcrf_ip = "pcrf"
-
-    print(f"smf_ip {smf_ip}")
     print(f"nrf_ip {nrf_ip}")
     print(f"pcrf_ip {pcrf_ip}")
 
@@ -142,7 +132,7 @@ def init_smf(upf=1):
         upf_i = i + 1
         upf_ip = __get_ip(f'upf_ip_{upf_i}')
         #upf_ips.append({'addr': upf_ip,'dnn':f'internet{upf_i}'})
-        upf_ips.append({'addr': f"upf-{i}",'dnn':f'internet{upf_i}'})
+        upf_ips.append({'addr': f"upf-{upf_i}",'dnn':f'internet{upf_i}'})
         print(f"upf_ip_{upf_i} {upf_ip}")
 
     config = bios.read('/5gs/etc/open5gs/smf.yaml')
@@ -183,13 +173,11 @@ def init_amf():
     amf_ip = __get_own_ip()
     print(f"amf_ip {amf_ip}")
     __publish_ip('amf_ip', amf_ip)
+
     nrf_ip = __get_ip('nrf_ip')
     print(f"nrf_ip {nrf_ip}")
 
-    amf_ip = "amf"
     nrf_ip = "nrf"
-
-    print(f"amf_ip {amf_ip}")
     print(f"nrf_ip {nrf_ip}")
 
     config = bios.read('/5gs/etc/open5gs/amf.yaml')
@@ -204,9 +192,6 @@ def init_sgwu():
     print(f"sgwu_ip {sgwu_ip}")
     __publish_ip('sgwu_ip', sgwu_ip)
 
-    sgwu_ip = "sgwu"
-    print(f"sgwu_ip {sgwu_ip}")
-
     config = bios.read('/5gs/etc/open5gs/sgwu.yaml')
     config['sgwu']['pfcp'] = {'addr': sgwu_ip}
     config['sgwu']['gtpu'] = {'addr': sgwu_ip}
@@ -217,9 +202,6 @@ def init_upf(scale=1):
     upf_ip = __get_own_ip()
     print(f"upf_ip {upf_ip}")
     __publish_ip(f'upf_ip_{scale}', upf_ip)
-
-    upf_ip = f"upf-{scale}"
-    print(f"upf_ip {upf_ip}")
 
     config = bios.read('/5gs/etc/open5gs/upf.yaml')
     config['upf']['pfcp'] = {'addr': upf_ip}
@@ -235,10 +217,7 @@ def init_hss():
     mme_ip = __get_ip('mme_ip')
     print(f"mme_ip {mme_ip}")
     
-    hss_ip = "hss"
     mme_ip = "mme"
-
-    print(f"hss_ip {hss_ip}")
     print(f"mme_ip {mme_ip}")
 
     config = bios.read('/5gs/etc/open5gs/hss.yaml')
@@ -278,10 +257,7 @@ def init_pcrf():
     smf_ip = __get_ip('smf_ip')
     print(f"smf_ip {smf_ip}")
 
-    pcrf_ip = "pcrf"
     smf_ip = "smf"
-
-    print(f"pcrf_ip {pcrf_ip}")
     print(f"smf_ip {smf_ip}")
 
     config = bios.read('/5gs/etc/open5gs/pcrf.yaml')
@@ -318,9 +294,6 @@ def init_nrf():
     print(f"nrf_ip {nrf_ip}")
     __publish_ip('nrf_ip', nrf_ip)
 
-    nrf_ip = "nrf"
-    print(f"nrf_ip {nrf_ip}")
-
     config = bios.read('/5gs/etc/open5gs/nrf.yaml')
     config['db_uri'] = 'mongodb://mongodb/open5gs'
     config['nrf']['sbi'] = {'addr': nrf_ip, 'port': 7777}
@@ -331,13 +304,11 @@ def init_ausf():
     ausf_ip = __get_own_ip()
     print(f"ausf_ip {ausf_ip}")
     __publish_ip('ausf_ip', ausf_ip)
+
     nrf_ip = __get_ip('nrf_ip')
     print(f"nrf_ip {nrf_ip}")
 
-    ausf_ip = "ausf"
     nrf_ip = "nrf"
-
-    print(f"ausf_ip {ausf_ip}")
     print(f"nrf_ip {nrf_ip}")
 
     config = bios.read('/5gs/etc/open5gs/ausf.yaml')
@@ -350,13 +321,11 @@ def init_udm():
     udm_ip = __get_own_ip()
     print(f"udm_ip {udm_ip}")
     __publish_ip('udm_ip', udm_ip)
+
     nrf_ip = __get_ip('nrf_ip')
     print(f"nrf_ip {nrf_ip}")
 
-    udm_ip = "udm"
     nrf_ip = "nrf"
-
-    print(f"udm_ip {udm_ip}")
     print(f"nrf_ip {nrf_ip}")
 
     config = bios.read('/5gs/etc/open5gs/udm.yaml')
@@ -369,13 +338,11 @@ def init_pcf():
     pcf_ip = __get_own_ip()
     print(f"pcf_ip {pcf_ip}")
     __publish_ip('pcf_ip', pcf_ip)
+
     nrf_ip = __get_ip('nrf_ip')
     print(f"nrf_ip {nrf_ip}")
 
-    pcf_ip = "pcf"
     nrf_ip = "nrf"
-
-    print(f"pcf_ip {pcf_ip}")
     print(f"nrf_ip {nrf_ip}")
 
     config = bios.read('/5gs/etc/open5gs/pcf.yaml')
@@ -389,13 +356,11 @@ def init_nssf():
     nssf_ip = __get_own_ip()
     print(f"nssf_ip {nssf_ip}")
     __publish_ip('nssf_ip', nssf_ip)
+
     nrf_ip = __get_ip('nrf_ip')
     print(f"nrf_ip {nrf_ip}")
 
-    nssf_ip = "nssf"
     nrf_ip = "nrf"
-
-    print(f"nssf_ip {nssf_ip}")
     print(f"nrf_ip {nrf_ip}")
 
     config = bios.read('/5gs/etc/open5gs/nssf.yaml')
@@ -408,13 +373,11 @@ def init_udr():
     udr_ip = __get_own_ip()
     print(f"udr_ip {udr_ip}")
     __publish_ip('udr_ip', udr_ip)
+
     nrf_ip = __get_ip('nrf_ip')
     print(f"nrf_ip {nrf_ip}")
 
-    udr_ip = "udr"
     nrf_ip = "nrf"
-
-    print(f"udr_ip {udr_ip}")
     print(f"nrf_ip {nrf_ip}")
 
     config = bios.read('/5gs/etc/open5gs/udr.yaml')
@@ -428,13 +391,8 @@ def init_gnb():
     gnb_ip = __get_own_ip()
     print(f"gnb_ip {gnb_ip}")
     __publish_ip('gnb_ip', gnb_ip)
+
     amf_ip = __get_ip('amf_ip')
-    print(f"amf_ip {amf_ip}")
-
-    gnb_ip = "gnb"
-    amf_ip = "amf"
-
-    print(f"gnb_ip {gnb_ip}")
     print(f"amf_ip {amf_ip}")
     
     config = bios.read('/UERANSIM/config/open5gs-gnb.yaml')
